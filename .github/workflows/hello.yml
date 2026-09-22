@@ -1,31 +1,56 @@
-
 name: Primeiro CI
-
 
 on:
 
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
- push:
-   branches: [ "main" ]
- pull_request:
-   branches: [ "main" ]
+#Regras fp github pages    
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+ group: "pages"
+ cancel-in-progress: false
 
 
 jobs:
- Compilar:
- #Cria máquina virtual para usar no pipeline
-   runs-on: ubuntu-latest
+  Compilar: 
+  #Cria máquina virtual para usar no pipeline
+    runs-on: ubuntu-latest
 
+    steps:
+      - name: Fazer o git clone
+        uses: actions/checkout@v4
 
-   steps:
-     - name: Fazer o git clone
-       uses: actions/checkout@v4
+      - name: Executando primeiro comando
+        run: echo "Hello, world!"
+      
+      - name: Executando dois ou mais comandos
+        run: |
+           ls -l
+           echo Fim do PROCESSO 
 
-
-     - name: Executando primeiro comando
-       run: echo "Hello, world!"
-    
-     - name: Executando dois ou mais comandos
-       run: |
-          ls -l
-          echo Fim do PROCESSO
+  # Single deploy job since we're just deploying
+  deploy:
+    needs: Compilar
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: '.'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
