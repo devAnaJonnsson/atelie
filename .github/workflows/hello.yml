@@ -71,5 +71,5 @@ jobs:
           # Path to the Dockerfile
           file: Docker File
           push: true
-          tags: devanajonnsson/img.vermelho
+          tags: devanajonnsson/img.vermelho:1.0
   
